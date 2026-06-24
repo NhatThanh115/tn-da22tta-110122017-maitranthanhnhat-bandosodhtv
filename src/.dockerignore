@@ -1,0 +1,48 @@
+# === Dependencies ===
+node_modules/
+.pnpm-store/
+
+# === Build output ===
+dist/
+dist-ssr/
+.vite/
+
+# === Secrets & Env ===
+.env
+.env.*
+!.env.example
+
+# === Database data ===
+pgdata/
+
+# === IDE & Editor ===
+.vscode/
+.cursor/
+.idea/
+
+# === OS Files ===
+Thumbs.db
+.DS_Store
+Desktop.ini
+
+# === Logs ===
+*.log
+logs/
+
+# === Docs ===
+README.md
+*.md
+
+# === Docker files (không cần copy vào image) ===
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# === Misc ===
+.git/
+.gitignore
+coverage/
+tmp/
+temp/
+*.tgz
+*.zip

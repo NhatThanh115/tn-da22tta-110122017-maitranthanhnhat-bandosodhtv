@@ -1,0 +1,74 @@
+
+services:
+
+  # ─── Database ────────────────────────────────────────────────
+  db:
+    # Image tích hợp sẵn PostGIS 3.5 + pgRouting 4.0 trên PostgreSQL 15
+    # Nguồn: https://hub.docker.com/r/pgrouting/pgrouting/tags
+    image: pgrouting/pgrouting:15-3.5-4.0
+    container_name: tvu_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${DB_NAME:-postgres}
+      POSTGRES_USER:     ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-123456}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # init.sql chỉ chạy 1 lần khi volume chưa tồn tại
+      - ./schema/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s   # Cho phép DB khởi động và chạy init.sql
+
+  # ─── Backend ─────────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner           # Build tới stage runner (production-ready)
+    container_name: tvu_backend
+    restart: unless-stopped
+    env_file: .env             # Đọc từ .env (tạo từ .env.example)
+    environment:
+      NODE_ENV: development
+      DB_HOST:  db             # Tên service, KHÔNG phải localhost
+    ports:
+      - "${PORT:-3000}:3000"
+    volumes:
+      # Persist uploads giữa các restart, không copy vào image
+      - ./public/uploads:/app/public/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ─── Frontend (Dev) ──────────────────────────────────────────
+  frontend:
+    # Không build image riêng – mount source từ host để hot-reload
+    image: node:20-alpine
+    container_name: tvu_frontend
+    working_dir: /app
+    # FIX cross-platform: node_modules cài trên Windows không tương thích
+    # với Linux container (native binary musl khác Win32).
+    # Giải pháp: dùng named volume che đi node_modules host, sau đó
+    # chạy npm install BÊN TRONG container để cài đúng binary Linux.
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
+    volumes:
+      # Mount toàn bộ source code từ host (hot-reload)
+      - .:/app:delegated
+      # Named volume che đi node_modules Windows → container dùng riêng
+      - frontend_node_modules:/app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+    name: tvu_pgdata          # Tên rõ ràng để dễ quản lý
+  frontend_node_modules:      # Volume Linux-native node_modules cho frontend
+    name: tvu_frontend_node_modules

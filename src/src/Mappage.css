@@ -1,0 +1,1586 @@
+﻿/* ============================================================
+   MAPPAGE.CSS  –  Google Maps–style layout for TVU Digital Map
+   ============================================================ */
+
+/* ---------- Google Fonts ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap');
+
+/* ---------- CSS Variables ---------- */
+:root {
+  --gm-blue:       #1a73e8;
+  --gm-blue-dark:  #1558b0;
+  --gm-blue-light: #e8f0fe;
+  --gm-red:        #ea4335;
+  --gm-green:      #34a853;
+  --gm-yellow:     #fbbc04;
+  --gm-gray-50:    #f8f9fa;
+  --gm-gray-100:   #f1f3f4;
+  --gm-gray-200:   #e8eaed;
+  --gm-gray-400:   #bdc1c6;
+  --gm-gray-600:   #80868b;
+  --gm-gray-800:   #3c4043;
+  --gm-text:       #202124;
+  --gm-shadow-sm:  0 1px 3px rgba(0,0,0,.2), 0 1px 2px rgba(0,0,0,.14);
+  --gm-shadow-md:  0 2px 6px rgba(0,0,0,.2), 0 2px 4px rgba(0,0,0,.14);
+  --gm-shadow-lg:  0 4px 12px rgba(0,0,0,.25);
+  --gm-shadow-xl:  0 8px 28px rgba(0,0,0,.28);
+  --panel-width:   400px;
+  --header-h:      64px;
+  --radius-sm:     8px;
+  --radius-md:     12px;
+  --radius-lg:     24px;
+  --radius-pill:   50px;
+  --transition:    0.22s cubic-bezier(.4,0,.2,1);
+}
+
+/* ---------- Base Reset ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+.mappage-root {
+  font-family: 'Roboto', 'Google Sans', sans-serif;
+  /* Fixed positioning ensures we always fill the real visual viewport
+     (avoids the mobile address-bar 100vh bug) */
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--gm-gray-100);
+  color: var(--gm-text);
+}
+
+/* ============================================================
+   FULL-SCREEN MAP BACKGROUND
+   ============================================================ */
+.gm-map-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.gm-map-layer .leaflet-map-container {
+  width: 100%;
+  height: 100%;
+  min-height: unset;
+}
+
+/* ============================================================
+   FLOATING SEARCH BAR (desktop, top-left)
+   ============================================================ */
+.gm-float-search {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 340px;
+  pointer-events: auto;
+}
+.gm-brand-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border-radius: var(--radius-pill);
+  padding: 6px 14px 6px 8px;
+  box-shadow: var(--gm-shadow-md);
+  width: fit-content;
+}
+.gm-brand-pill .gm-logo {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #111D4A 60%, #2667FF 100%);
+  color: #EEC643;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.82rem;
+  flex-shrink: 0;
+}
+.gm-brand-pill .gm-brand-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--gm-text);
+}
+/* Hàng trên cùng: nút home + brand-pill cạnh nhau */
+.gm-float-top-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Nút trở về Homepage (chỉ desktop) */
+.gm-back-home-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: #fff;
+  box-shadow: var(--gm-shadow-md);
+  color: var(--gm-gray-600);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: box-shadow var(--transition), color var(--transition), transform var(--transition);
+  flex-shrink: 0;
+}
+.gm-back-home-btn:hover {
+  box-shadow: var(--gm-shadow-lg);
+  color: var(--gm-blue);
+  transform: scale(1.08);
+}
+
+/* Search box nằm trong float-search */
+.gm-float-search .gm-search-box {
+  background: #fff;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--gm-shadow-md);
+  border: none;
+}
+.gm-float-search .gm-search-box:focus-within {
+  box-shadow: var(--gm-shadow-lg);
+  border: none;
+}
+
+/* ============================================================
+   INFO SIDEBAR (slide-in khi chọn địa điểm)
+   ============================================================ */
+.gm-info-sidebar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--panel-width);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  box-shadow: var(--gm-shadow-xl);
+  overflow: hidden;  /* ảnh cover không tràn */
+}
+
+/* Ảnh bìa đầu sidebar */
+.gm-sb-img-wrap {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.gm-sb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.gm-sb-img-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,.6) 0%, transparent 55%);
+}
+/* Nút đóng sidebar */
+.gm-sb-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,.45);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition);
+  z-index: 2;
+}
+.gm-sb-close:hover { background: rgba(0,0,0,.65); }
+
+/* Vùng nội dung cuộn */
+.gm-sb-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 16px 24px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gm-gray-200) transparent;
+}
+.gm-sb-body::-webkit-scrollbar { width: 5px; }
+.gm-sb-body::-webkit-scrollbar-thumb { background: var(--gm-gray-200); border-radius: 3px; }
+
+/* Transition slide-in từ trái */
+.sidebar-slide-enter-active {
+  transition: transform 0.3s cubic-bezier(.4,0,.2,1), opacity 0.25s;
+}
+.sidebar-slide-leave-active {
+  transition: transform 0.25s cubic-bezier(.4,0,.2,1), opacity 0.2s;
+}
+.sidebar-slide-enter-from,
+.sidebar-slide-leave-to {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+/* Nút quay lại trong direction panel */
+.gm-dir-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  background: none;
+  border: none;
+  color: var(--gm-blue);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 4px 0;
+  transition: opacity var(--transition);
+}
+.gm-dir-back-btn:hover { opacity: 0.75; }
+
+/* Padding top của gm-dir-panel khi ở trong sidebar */
+.gm-info-sidebar .gm-dir-panel {
+  border: none;
+  padding: 0;
+}
+
+
+/* ----- Sidebar Header / Search ----- */
+.gm-sidebar-header {
+  flex-shrink: 0;
+  padding: 14px 14px 10px;
+  background: #fff;
+  border-bottom: 1px solid var(--gm-gray-200);
+}
+
+/* Brand row */
+.gm-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.gm-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #111D4A 60%, #2667FF 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #EEC643;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.gm-brand-name {
+  font-family: 'Google Sans', 'Roboto', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--gm-text);
+  line-height: 1.2;
+}
+.gm-brand-sub {
+  font-size: 0.72rem;
+  color: var(--gm-blue);
+  font-weight: 500;
+}
+
+/* Search box */
+.gm-search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--gm-gray-50);
+  border: 1px solid var(--gm-gray-200);
+  border-radius: var(--radius-pill);
+  padding: 0 14px;
+  height: 46px;
+  transition: box-shadow var(--transition), border-color var(--transition), background var(--transition);
+}
+.gm-search-box:focus-within {
+  background: #fff;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
+}
+.gm-search-icon { color: var(--gm-gray-600); font-size: 0.9rem; flex-shrink: 0; }
+.gm-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.95rem;
+  color: var(--gm-text);
+  font-family: inherit;
+}
+.gm-search-input::placeholder { color: var(--gm-gray-400); }
+.gm-search-clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--gm-gray-600);
+  padding: 4px;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  transition: background var(--transition), color var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gm-search-clear:hover { background: var(--gm-gray-200); color: var(--gm-text); }
+
+/* ── Search wrap: bao search-box + dropdown ── */
+.gm-search-wrap {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ── Dropdown kết quả tìm kiếm (Desktop) ── */
+.gm-search-results {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: var(--radius-md);
+  box-shadow: var(--gm-shadow-xl);
+  border: 1px solid var(--gm-gray-200);
+  overflow: hidden;
+  z-index: 999;
+  animation: gmDropFade 0.16s ease;
+}
+@keyframes gmDropFade {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.gm-search-result-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--gm-gray-100);
+  transition: background var(--transition);
+}
+.gm-search-result-item:last-child { border-bottom: none; }
+.gm-search-result-item:hover { background: var(--gm-gray-50); }
+.gm-sr-icon {
+  color: var(--gm-blue);
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  width: 18px;
+  text-align: center;
+}
+.gm-sr-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.gm-sr-name {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--gm-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gm-sr-cat {
+  font-size: 0.75rem;
+  color: var(--gm-gray-600);
+  text-transform: capitalize;
+}
+.gm-sr-empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px;
+  color: var(--gm-gray-600);
+  font-size: 0.86rem;
+  justify-content: center;
+}
+.gm-search-results-empty {
+  padding: 4px 0;
+}
+
+/* ── Mobile search: nút clear ── */
+.gm-mobile-search-clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #aaa;
+  font-size: 0.85rem;
+  padding: 4px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+}
+.gm-mobile-search-clear:hover { color: #333; }
+
+/* ── Mobile search dropdown ── */
+.gm-mobile-search-results {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.18);
+  overflow: hidden;
+  z-index: 1200;
+  animation: gmDropFade 0.16s ease;
+}
+
+
+/* Direction toggle button */
+.gm-dir-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--gm-blue-light);
+  color: var(--gm-blue);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition);
+  align-self: flex-start;
+  font-family: inherit;
+}
+.gm-dir-toggle:hover { background: #d2e3fc; }
+
+/* ----- Quick-filter chips ----- */
+.gm-chips-bar {
+  flex-shrink: 0;
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--gm-gray-200);
+}
+.gm-chips-bar::-webkit-scrollbar { display: none; }
+.gm-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--gm-gray-200);
+  background: #fff;
+  color: var(--gm-gray-800);
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: inherit;
+}
+.gm-chip:hover { background: var(--gm-gray-100); border-color: var(--gm-gray-400); }
+.gm-chip.active {
+  background: var(--gm-blue-light);
+  border-color: var(--gm-blue);
+  color: var(--gm-blue);
+}
+.gm-chip i { font-size: 0.75rem; }
+
+/* ----- Sidebar body: results list ----- */
+.gm-sidebar-body {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gm-gray-200) transparent;
+}
+.gm-sidebar-body::-webkit-scrollbar { width: 6px; }
+.gm-sidebar-body::-webkit-scrollbar-thumb { background: var(--gm-gray-200); border-radius: 3px; }
+
+/* Section title */
+.gm-section-title {
+  padding: 14px 16px 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--gm-gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Location result card */
+.gm-result-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--gm-gray-100);
+  transition: background var(--transition);
+}
+.gm-result-item:hover { background: var(--gm-gray-50); }
+.gm-result-item.selected { background: var(--gm-blue-light); }
+
+.gm-result-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--gm-gray-200);
+}
+.gm-result-thumb-placeholder {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  background: var(--gm-blue-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gm-blue);
+  font-size: 1.2rem;
+}
+
+.gm-result-info { flex: 1; min-width: 0; }
+.gm-result-name {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--gm-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 3px;
+}
+.gm-result-meta {
+  font-size: 0.78rem;
+  color: var(--gm-gray-600);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gm-result-badge {
+  font-size: 0.68rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--gm-gray-100);
+  color: var(--gm-gray-600);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+/* Empty state */
+.gm-empty-state {
+  padding: 40px 24px;
+  text-align: center;
+  color: var(--gm-gray-600);
+}
+.gm-empty-state i { font-size: 2.5rem; color: var(--gm-gray-400); margin-bottom: 12px; display: block; }
+.gm-empty-state p { font-size: 0.9rem; line-height: 1.5; margin: 0; }
+
+/* ============================================================
+   DIRECTION PANEL (inside sidebar)
+   ============================================================ */
+.gm-dir-panel {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--gm-gray-200);
+}
+.gm-dir-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--gm-gray-50);
+  margin-bottom: 8px;
+  font-size: 0.88rem;
+  color: var(--gm-text);
+}
+.gm-dir-row i { width: 18px; text-align: center; color: var(--gm-gray-600); font-size: 1rem; flex-shrink: 0; }
+.gm-dir-dot-line {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0 10px 8px;
+}
+.gm-dir-dot-line span {
+  display: block;
+  width: 2px;
+  height: 6px;
+  background: var(--gm-gray-400);
+  border-radius: 2px;
+}
+.gm-dir-actions { display: flex; gap: 8px; }
+.gm-btn-find {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--gm-blue);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: background var(--transition);
+}
+.gm-btn-find:hover:not(:disabled) { background: var(--gm-blue-dark); }
+.gm-btn-find:disabled { opacity: 0.6; cursor: not-allowed; }
+.gm-btn-stop {
+  padding: 10px 14px;
+  border: 1.5px solid var(--gm-red);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--gm-red);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background var(--transition);
+}
+.gm-btn-stop:hover { background: #fce8e6; }
+.gm-dir-error {
+  font-size: 0.82rem;
+  color: var(--gm-red);
+  padding: 6px 8px;
+  background: #fce8e6;
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── Điểm bắt đầu custom ── */
+.gm-dir-row-start {
+  cursor: default;
+  position: relative;
+}
+.gm-dir-start-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Màu xanh lá khi đã chọn custom */
+.gm-dir-row-custom {
+  background: #e6f4ea;
+  border: 1px solid #a8d5b5;
+}
+.gm-dir-row-custom i { color: var(--gm-green) !important; }
+
+/* Nút reset về GPS */
+.gm-dir-reset-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--gm-gray-600);
+  font-size: 0.8rem;
+  padding: 4px 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition), color var(--transition);
+  flex-shrink: 0;
+}
+.gm-dir-reset-btn:hover { background: var(--gm-gray-200); color: var(--gm-text); }
+
+/* Nút "Chọn trên bản đồ" */
+.gm-dir-pick-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  border: 1.5px dashed var(--gm-blue);
+  border-radius: var(--radius-sm);
+  background: var(--gm-blue-light);
+  color: var(--gm-blue);
+  font-size: 0.83rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--transition), border-color var(--transition);
+}
+.gm-dir-pick-btn:hover { background: #d2e3fc; border-style: solid; }
+.gm-dir-pick-btn i { font-size: 0.9rem; }
+
+/* ============================================================
+   PICK MODE BANNER (overlay trên bản đồ)
+   ============================================================ */
+.gm-pick-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  pointer-events: none;
+}
+.gm-pick-banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--gm-green);
+  color: #fff;
+  padding: 12px 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  pointer-events: auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+/* Đẩy banner xuống dưới sidebar header trên desktop */
+@media (min-width: 769px) {
+  .gm-pick-banner-inner {
+    margin-left: var(--panel-width);
+  }
+}
+.gm-pick-banner-inner i { font-size: 1.1rem; animation: pulse-icon 1.2s infinite; }
+@keyframes pulse-icon {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.25); }
+}
+.gm-pick-banner-inner span { flex: 1; }
+.gm-pick-cancel {
+  background: rgba(255,255,255,.22);
+  border: 1.5px solid rgba(255,255,255,.5);
+  color: #fff;
+  border-radius: var(--radius-pill);
+  padding: 5px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background var(--transition);
+  white-space: nowrap;
+}
+.gm-pick-cancel:hover { background: rgba(255,255,255,.35); }
+
+/* ============================================================
+   PICK MARKER (L.divIcon xanh lá)
+   ============================================================ */
+.gm-pick-icon { background: none; border: none; }
+.gm-pick-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--gm-green);
+  border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(52,168,83,.55);
+  animation: pop-in 0.25s cubic-bezier(.4,0,.2,1);
+}
+@keyframes pop-in {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+
+
+/* ============================================================
+   LOCATION DETAIL PANEL (bottom of sidebar when item selected)
+   ============================================================ */
+.gm-detail-panel {
+  flex-shrink: 0;
+  border-top: 1px solid var(--gm-gray-200);
+  background: #fff;
+  max-height: 56vh;
+  overflow-y: auto;
+  animation: slideUp 0.28s cubic-bezier(.4,0,.2,1);
+}
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.gm-detail-img-wrap {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+}
+.gm-detail-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.gm-detail-img-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,.55) 0%, transparent 50%);
+}
+.gm-detail-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,.4);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition);
+}
+.gm-detail-close:hover { background: rgba(0,0,0,.6); }
+.gm-detail-badge {
+  position: absolute;
+  bottom: 10px;
+  left: 12px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: rgba(26,115,232,.88);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+}
+
+.gm-detail-body { padding: 14px 16px; }
+.gm-detail-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--gm-text);
+  margin: 0 0 6px;
+  line-height: 1.3;
+}
+.gm-detail-desc {
+  font-size: 0.875rem;
+  color: var(--gm-gray-600);
+  line-height: 1.6;
+  margin: 0 0 14px;
+}
+
+/* Action buttons row (Directions / Save / Share) */
+.gm-detail-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.gm-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--gm-gray-100);
+  color: var(--gm-blue);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition);
+  font-family: inherit;
+  min-width: 64px;
+}
+.gm-action-btn i { font-size: 1.1rem; }
+.gm-action-btn:hover { background: var(--gm-blue-light); }
+.gm-action-btn-primary {
+  flex: 1;
+  flex-direction: row;
+  padding: 11px 16px;
+  background: var(--gm-blue);
+  color: #fff;
+  font-size: 0.9rem;
+  border-radius: var(--radius-sm);
+  gap: 8px;
+}
+.gm-action-btn-primary:hover { background: var(--gm-blue-dark); }
+
+/* ============================================================
+   FAB BUTTONS (right side of map)
+   ============================================================ */
+.gm-fab-group {
+  position: absolute;
+  right: 16px;
+  bottom: 40px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.gm-fab {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: #fff;
+  box-shadow: var(--gm-shadow-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--gm-gray-800);
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+.gm-fab:hover { box-shadow: var(--gm-shadow-xl); transform: scale(1.06); }
+.gm-fab-locate { color: var(--gm-blue); }
+
+/* ============================================================
+   GOOGLE MAPS STYLE SCALE / ATTRIBUTION (bottom left)
+   ============================================================ */
+.gm-attribution {
+  position: absolute;
+  bottom: 8px;
+  left: calc(var(--panel-width) + 12px);
+  z-index: 100;
+  font-size: 0.72rem;
+  color: var(--gm-gray-600);
+  pointer-events: none;
+}
+
+/* ============================================================
+   VUE TRANSITIONS
+   ============================================================ */
+.detail-enter-active, .detail-leave-active { transition: transform 0.28s cubic-bezier(.4,0,.2,1), opacity 0.28s; }
+.detail-enter-from { transform: translateY(20px); opacity: 0; }
+.detail-leave-to  { transform: translateY(20px); opacity: 0; }
+
+.fade-enter-active, .fade-leave-active { transition: opacity 0.2s; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+
+/* ============================================================
+   TOP-RIGHT: Map type switcher / mini panel
+   ============================================================ */
+.gm-top-right {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.gm-layer-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: #fff;
+  box-shadow: var(--gm-shadow-md);
+  color: var(--gm-gray-800);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: box-shadow var(--transition);
+}
+.gm-layer-btn:hover { box-shadow: var(--gm-shadow-lg); }
+.gm-layer-btn i { color: var(--gm-blue); }
+
+/* ============================================================
+   MOBILE BOTTOM SHEET  (≤ 768px)
+   ============================================================ */
+.gm-mobile-header {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1010;
+  background: #fff;
+  box-shadow: var(--gm-shadow-sm);
+  padding: 8px 12px;
+  align-items: center;
+  gap: 10px;
+}
+.gm-mobile-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #111D4A 60%, #2667FF 100%);
+  color: #EEC643;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.88rem;
+  flex-shrink: 0;
+}
+.gm-mobile-search-wrap { flex: 1; position: relative; }
+.gm-mobile-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--gm-gray-100);
+  border-radius: var(--radius-pill);
+  padding: 0 12px;
+  height: 40px;
+  border: 1.5px solid transparent;
+  transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
+}
+.gm-mobile-search-box:focus-within {
+  background: #fff;
+  border-color: var(--gm-gray-400);
+  box-shadow: 0 2px 6px rgba(0,0,0,.12);
+}
+.gm-mobile-search-box input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--gm-text);
+}
+.gm-mobile-search-box input::placeholder { color: var(--gm-gray-400); }
+.gm-mobile-search-box i { color: var(--gm-gray-600); font-size: 0.85rem; }
+
+/* Bottom sheet drawer */
+.gm-bottom-sheet {
+  position: fixed;
+  /* Đặt trên thanh nav mobile (58px), không bị che */
+  bottom: 58px;
+  left: 0;
+  right: 0;
+  z-index: 500;
+  background: #fff;
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -4px 20px rgba(0,0,0,.2);
+  /* Tính max-height: toàn màn hình trừ header (56px) trừ nav (58px) */
+  max-height: calc(100vh - 56px - 58px);
+  overflow-y: auto;
+  /* Safe area cho màn hình có notch */
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  /* Animate height khi thu gọn */
+  transition: max-height 0.32s cubic-bezier(.4,0,.2,1),
+              border-color  0.22s;
+}
+
+/* Trạng thái THU GỌN khi đang navigate */
+.gm-sheet-minimized {
+  max-height: 80px !important;
+  overflow: hidden;
+  border-top: 3px solid var(--gm-blue);
+  box-shadow: 0 -2px 12px rgba(26,115,232,.25);
+}
+/* Khi thu gọn ở pick mode → border xanh lá */
+.gm-sheet-minimized.gm-pick-active {
+  border-top-color: var(--gm-green);
+  box-shadow: 0 -2px 12px rgba(52,168,83,.3);
+}
+/* Handle kéo – tăng vùng chạm khi đang thu gọn */
+.gm-sheet-minimized .gm-sheet-handle {
+  width: 60px;
+  height: 5px;
+  background: var(--gm-blue);
+  margin-bottom: 0;
+  cursor: ns-resize;
+  /* Tăng vùng chạm touch lên 44px (tiêu chuẩn WCAG) */
+  padding: 20px 0;
+  margin-top: -16px;
+  background-clip: content-box;
+}
+.gm-sheet-close {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: var(--gm-gray-100);
+  color: var(--gm-gray-800);
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Padding dưới nội dung đủ để nút cuối không bị cắt */
+.gm-sheet-content { padding: 0 16px 20px; }
+
+/* Handle kéo (base) */
+.gm-sheet-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--gm-gray-400);
+  margin: 10px auto 6px;
+  cursor: grab;
+  transition: width 0.22s, background 0.22s;
+}
+
+/* ── Mini nav bar khi sheet thu gọn ── */
+.gm-sheet-mini {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 16px 10px;
+}
+.gm-sheet-mini-dest {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--gm-text);
+  overflow: hidden;
+}
+.gm-sheet-mini-dest span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Nút dừng dạng compact */
+.gm-btn-stop-mini {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+
+/* Sheet slide transition */
+.sheet-enter-active, .sheet-leave-active { transition: transform 0.3s cubic-bezier(.4,0,.2,1); }
+.sheet-enter-from, .sheet-leave-to { transform: translateY(100%); }
+
+/* Backdrop */
+.gm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: rgba(0,0,0,.4);
+}
+
+/* Bottom hint bar – nằm ngay trên thanh nav */
+.gm-bottom-hint {
+  position: fixed;
+  bottom: 58px;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 14px 20px;
+  background: #fff;
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -3px 12px rgba(0,0,0,.15);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--gm-gray-600);
+}
+.gm-bottom-hint i { color: var(--gm-blue); }
+
+/* Mobile bottom nav — dùng chung style với Homepage */
+.mobile-bottom-nav { display: none; }
+
+/* ============================================================
+   RESPONSIVE — Mobile (≤ 768px)
+   ============================================================ */
+@media (max-width: 768px) {
+  /* Ẩn floating search và sidebar trên mobile (dùng mobile header thay thế) */
+  .gm-float-search  { display: none; }
+  .gm-info-sidebar  { display: none; }
+
+  .gm-top-right { top: 68px; right: 12px; }
+  /* FAB ở trên nav (64px) + gap */
+  .gm-fab-group { bottom: calc(64px + 60px); right: 12px; }
+  .gm-attribution { left: 8px; bottom: calc(64px + 8px); }
+
+  .gm-mobile-header { display: flex; }
+
+  /* Kích hoạt nav kiểu Homepage */
+  .mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: #ffffff;
+    border-top: 1px solid #eee;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.1);
+    z-index: 2000;
+    align-items: stretch;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px 4px;
+    color: #999;
+    font-size: 0.65rem;
+    font-weight: 600;
+    font-family: 'Roboto', 'Google Sans', sans-serif;
+    transition: color 0.2s;
+    position: relative;
+  }
+  .bottom-nav-item i {
+    font-size: 1.2rem;
+    transition: transform 0.2s;
+  }
+  .bottom-nav-item.bnav-active { color: var(--gm-blue); }
+  .bottom-nav-item.bnav-active i { transform: scale(1.1); }
+
+  /* Nút center nổi bật (Bản đồ) */
+  .bottom-nav-center {
+    flex: 1;
+    justify-content: flex-start;
+    padding-top: 2px;
+  }
+  .bnav-center-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gm-blue) 0%, #1558b0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(26,115,232,0.5);
+    margin-top: -18px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .bnav-center-circle i {
+    color: white;
+    font-size: 1.3rem;
+    transform: none !important;
+  }
+  .bottom-nav-center:hover .bnav-center-circle,
+  .bottom-nav-center.bnav-active .bnav-center-circle {
+    transform: scale(1.08);
+    box-shadow: 0 6px 18px rgba(26,115,232,0.65);
+  }
+
+  /* Bản đồ chiếm vùng giữa header (56px) và bottom nav (64px).
+     Dùng position:fixed để tránh bị cuộn cùng document và fill đúng viewport. */
+  .gm-map-layer {
+    position: fixed;
+    top: 56px;
+    bottom: 64px;
+    left: 0;
+    right: 0;
+  }
+
+  .gm-bottom-hint   { border-radius: 14px 14px 0 0; }
+  .gm-bottom-sheet  { border-radius: 14px 14px 0 0; }
+}
+
+/* ============================================================
+   RESPONSIVE — Tablet (769px – 1100px)
+   ============================================================ */
+@media (min-width: 769px) and (max-width: 1100px) {
+  :root { --panel-width: 340px; }
+  .gm-float-search { width: 300px; }
+  /* Ẩn mobile bottom sheet trên tablet/desktop */
+  .gm-bottom-sheet { display: none !important; }
+}
+
+/* Ẩn mobile bottom sheet trên desktop lớn */
+@media (min-width: 1101px) {
+  .gm-bottom-sheet { display: none !important; }
+}
+
+
+/* ============================================================
+   SCROLLBAR — sidebar body
+   ============================================================ */
+.gm-sidebar-body::-webkit-scrollbar { width: 5px; }
+.gm-sidebar-body::-webkit-scrollbar-track { background: transparent; }
+.gm-sidebar-body::-webkit-scrollbar-thumb { background: var(--gm-gray-200); border-radius: 3px; }
+.gm-sidebar-body::-webkit-scrollbar-thumb:hover { background: var(--gm-gray-400); }
+
+/* ============================================================
+   LAYER PANEL & CONTROLS
+   ============================================================ */
+
+/* Top-right n�t toggle nhanh v? tinh / b?n d? */
+.gm-top-right {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 900;
+}
+
+.gm-layer-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(0,0,0,0.12);
+  border-radius: 22px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: all 0.2s ease;
+}
+.gm-layer-btn:hover {
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.22);
+  transform: translateY(-1px);
+}
+.gm-layer-btn-active {
+  background: linear-gradient(135deg, #1a73e8, #0d47a1);
+  color: #fff;
+  border-color: transparent;
+}
+.gm-layer-btn-active:hover {
+  background: linear-gradient(135deg, #1565c0, #0a3570);
+}
+
+/* FAB active state (khi panel dang m?) */
+.gm-fab-active {
+  background: linear-gradient(135deg, #1a73e8, #0d47a1) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(26,115,232,0.45) !important;
+}
+
+/* Panel ch?n layer - hi?n g?n FAB group */
+.gm-layer-panel {
+  position: absolute;
+  right: 70px;
+  bottom: 90px;
+  z-index: 1000;
+  background: rgba(255,255,255,0.97);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+  min-width: 220px;
+  border: 1px solid rgba(255,255,255,0.6);
+}
+.gm-layer-panel-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+  padding-left: 4px;
+}
+.gm-layer-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.gm-layer-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1.5px solid transparent;
+  background: #f5f5f5;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #333;
+  transition: all 0.18s ease;
+  text-align: left;
+}
+.gm-layer-option:hover {
+  background: #e8f0fe;
+  border-color: #c5d8fc;
+}
+.gm-layer-option-active {
+  background: #e8f0fe;
+  border-color: #1a73e8;
+  color: #1a73e8;
+  font-weight: 600;
+}
+.gm-layer-thumb {
+  width: 44px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.gm-layer-thumb-street {
+  background: linear-gradient(135deg, #e3f2fd, #90caf9);
+  color: #1565c0;
+}
+.gm-layer-thumb-satellite {
+  background: linear-gradient(135deg, #1a2744, #2d5a27);
+  color: #a5d6a7;
+}
+.gm-layer-check {
+  margin-left: auto;
+  color: #1a73e8;
+  font-size: 0.85rem;
+}
+
+/* Attribution n�ng c?p */
+.gm-attribution {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 800;
+  font-size: 0.68rem;
+  color: rgba(0,0,0,0.5);
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(4px);
+  padding: 2px 10px;
+  border-radius: 10px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Mobile: d?ch panel sang ph?i g?n FAB */
+@media (max-width: 768px) {
+  .gm-layer-panel {
+    right: 14px;
+    bottom: 160px;
+  }
+  .gm-top-right { display: none; }
+}
+
+/* ========================================
+   SEARCH GROUP LABEL (Toa nha / Phong hoc)
+   ======================================== */
+.gm-search-group-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px 5px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.gm-search-group-label i {
+  color: rgba(255,255,255,0.6);
+  font-size: 0.75rem;
+}
+
+/* ========================================
+   ROOM SELECTOR (trong Sidebar & Mobile Sheet)
+   ======================================== */
+.room-selector-wrap {
+  margin: 14px 0;
+  padding: 14px;
+  background: #f0f6ff;
+  border-radius: 12px;
+  border: 1px solid #bfdbfe;
+}
+
+.room-selector-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #1e40af;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.room-selector-header i { color: #3b82f6; }
+
+.room-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #3b82f6;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 20px;
+  line-height: 1.4;
+  margin-left: 4px;
+}
+
+.room-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.room-chip {
+  background: #fff;
+  border: 1.5px solid #93c5fd;
+  color: #1d4ed8;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+.room-chip:hover {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #1e40af;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(59,130,246,0.15);
+}
+.room-chip-active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.35);
+}
+
+.room-desc-card {
+  margin-top: 10px;
+  padding: 12px 14px;
+  background: #eff6ff;
+  border-radius: 8px;
+  border-left: 3px solid #3b82f6;
+}
+.room-desc-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1d4ed8;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.room-desc-text {
+  font-size: 0.82rem;
+  color: #374151;
+  margin: 0;
+  line-height: 1.5;
+}

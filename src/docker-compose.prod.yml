@@ -1,0 +1,37 @@
+# docker-compose.prod.yml
+# Dùng kết hợp: docker compose -f docker-compose.yml -f docker-compose.prod.yml up
+#
+# Lưu ý: Bỏ hoàn toàn block "ports" cho db và backend thay vì dùng
+# cú pháp "ports: !reset []" để đảm bảo tương thích với mọi phiên bản
+# Docker Compose (kể cả v1.x trên server cũ). Cú pháp !reset chỉ
+# hoạt động từ Docker Compose v2.x trở lên.
+services:
+
+  db:
+    restart: always
+    # Bỏ block ports → DB không bị expose ra ngoài server
+
+  backend:
+    environment:
+      NODE_ENV: production
+    # Bỏ block ports → Backend chỉ được gọi nội bộ qua Nginx
+
+  frontend:
+    # Override: Build Dockerfile.frontend thay vì mount host
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      target: runner
+    image: tvu_frontend:prod
+    # Ghi đè command dev bằng lệnh nginx (đã được CMD trong Dockerfile.frontend)
+    command: ["nginx", "-g", "daemon off;"]
+    # Không mount source code vào production container
+    volumes: []
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+    name: tvu_pgdata_prod
