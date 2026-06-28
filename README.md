@@ -11,8 +11,6 @@
 - [Công Nghệ Sử Dụng](#-công-nghệ-sử-dụng)
 - [Yêu Cầu Phần Mềm](#-yêu-cầu-phần-mềm)
 - [Hướng Dẫn Triển Khai](#-hướng-dẫn-triển-khai)
-  - [Chạy bằng Docker (Khuyến nghị)](#1-chạy-bằng-docker-khuyến-nghị)
-  - [Chạy thủ công (Môi trường phát triển)](#2-chạy-thủ-công-môi-trường-phát-triển)
 - [Biến Môi Trường](#-biến-môi-trường)
 - [API Endpoints](#-api-endpoints)
 
