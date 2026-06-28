@@ -1,6 +1,3 @@
--- ============================================================
--- DỮ LIỆU CHÈN VÀO BẢNG: landmarks
--- ============================================================
 
 INSERT INTO landmarks (name, category, description, geom) VALUES
 ('Tòa nhà B1', 'Khoa Kinh tế - Luật và Ngoại ngữ', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34593300613994, 9.922996662018221), 4326)),

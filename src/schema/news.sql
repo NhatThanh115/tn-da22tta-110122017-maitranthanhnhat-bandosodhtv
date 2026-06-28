@@ -1,24 +1,3 @@
--- Active: 1779293081967@@127.0.0.1@5432@postgres@public
--- ============================================================
--- DỮ LIỆU CHÈN VÀO BẢNG: news (Tin tức / Thông báo / Sự kiện)
--- Database: PostgreSQL
--- Mô tả: Dữ liệu mẫu cho hệ thống tin tức bản đồ số TVU.
---        Mỗi bản ghi có thể liên kết với một landmark (địa điểm)
---        qua khóa ngoại landmark_id.
--- Mapping landmark_id:
---   1  = Tòa nhà B1 (Khoa Kinh tế - Luật và Ngoại ngữ)
---   4  = Tòa nhà A1 (Khu hiệu bộ)
---   5  = Phòng Công tác Sinh viên
---   6  = Tòa nhà C1 (Khoa Y Dược)
---   10 = Tòa nhà C5 (Khoa Kỹ thuật và Công nghệ)
---   21 = Sân cỏ nhân tạo
---   35 = Tòa nhà E3 (Khoa Ngôn ngữ - Văn hóa - Nghệ thuật Khmer)
--- ============================================================
-
-
--- ============================================================
--- CHÈN DỮ LIỆU MẪU
--- ============================================================
 
 INSERT INTO news (title, content, image_url, type, published_at, landmark_id) VALUES
 

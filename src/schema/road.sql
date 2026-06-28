@@ -1,8 +1,4 @@
--- ============================================================
--- DỮ LIỆU CHÈN VÀO BẢNG: roads & road_nodes (Mạng lưới giao thông)
--- ============================================================
 
--- BƯỚC 1: Nạp thông tin hình học của các con đường từ file GeoJSON (Đã dọn dẹp và sửa lỗi topology)
 INSERT INTO roads (name, geom) VALUES
 ('Cổng trường', ST_GeomFromText('LINESTRING(106.346493 9.923712, 106.346504 9.923522)', 4326)),
 ('Đoạn B1', ST_GeomFromText('LINESTRING(106.346504 9.923522, 106.34634 9.92352, 106.346125 9.923193)', 4326)),
