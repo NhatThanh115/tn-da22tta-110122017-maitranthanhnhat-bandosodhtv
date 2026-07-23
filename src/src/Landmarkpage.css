@@ -616,18 +616,18 @@
 @media (max-width: 768px) {
   .lm-hero { padding: 2rem 1rem 2rem; }
   .lm-main { flex-direction: column; padding: 1rem; gap: 1rem; }
-  .lm-filter-sidebar { width: 100%; position: static; }
-  .lm-filter-list { display: flex; flex-wrap: wrap; gap: 6px; padding: 0.75rem; }
-  .lm-filter-item {
-    border: 1.5px solid #E2E8F0;
-    border-radius: 20px;
-    border-left: 1.5px solid #E2E8F0;
-    padding: 5px 12px;
-    font-size: 0.82rem;
+
+  /* Ẩn toàn bộ sidebar filter – thay bằng dropdown */
+  .lm-filter-sidebar { display: none; }
+
+  /* Stats bar: hiển thị dropdown */
+  .lm-stats-bar {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
   }
-  .lm-filter-item.active { border-color: #2667FF; background: #F0F4FF; }
-  .lm-filter-card { border-radius: 12px; }
-  .lm-filter-header { display: none; }
+  .lm-stats-text { font-size: 0.8rem; flex: 1; min-width: 120px; }
+
   .lm-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem; }
   .lm-card-img-wrap { height: 130px; }
   .lm-card-map-btn { opacity: 1; transform: scale(1); }
@@ -638,4 +638,93 @@
 @media (max-width: 480px) {
   .lm-grid { grid-template-columns: 1fr 1fr; }
   .lm-stats-bar { padding: 0.6rem 1rem; }
+}
+
+/* ── Mobile bottom nav padding ── */
+@media (max-width: 768px) {
+  .lm-wrapper {
+    padding-bottom: 64px; /* height of mobile bottom nav */
+  }
+}
+
+/* ── Dropdown lọc danh mục (mobile only) ── */
+.lm-mobile-filter-bar {
+  display: none; /* Ẩn trên desktop */
+}
+
+.lm-mobile-cat-select {
+  display: none; /* Ẩn trên desktop */
+}
+
+@media (max-width: 768px) {
+  /* Thanh filter bar */
+  .lm-mobile-filter-bar {
+    display: block;
+    background: #fff;
+    border-bottom: 1px solid #E2E8F0;
+    padding: 10px 1rem;
+  }
+
+  .lm-mobile-filter-inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #F0F4FF;
+    border: 1.5px solid #c7d7ff;
+    border-radius: 12px;
+    padding: 0 14px;
+    height: 46px;
+  }
+
+  .lm-mfb-icon {
+    color: #2667FF;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  /* Select full-width, không có border riêng */
+  .lm-mobile-cat-select {
+    display: block;
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #111D4A;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    /* Mũi tên xanh navy */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M0 0l6 7 6-7z' fill='%23111D4A'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0px center;
+    padding-right: 18px;
+  }
+
+  .lm-mobile-cat-select:focus {
+    outline: none;
+  }
+
+  /* Nút xóa filter (×) */
+  .lm-mfb-clear {
+    flex-shrink: 0;
+    background: #dce8ff;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #2667FF;
+    font-size: 0.75rem;
+    transition: background 0.2s, color 0.2s;
+  }
+  .lm-mfb-clear:hover {
+    background: #2667FF;
+    color: #fff;
+  }
 }

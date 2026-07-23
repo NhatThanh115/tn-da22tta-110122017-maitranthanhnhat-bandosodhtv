@@ -87,7 +87,12 @@ const LandmarkController = {
                 });
             }
 
-            const data = await LandmarkModel.create(req.body);
+            // Nếu có file upload → tạo image_url từ file
+            const image_url = req.file
+                ? `/uploads/${req.file.filename}`
+                : req.body.image_url || null;
+
+            const data = await LandmarkModel.create({ ...req.body, image_url });
             res.status(201).json({ success: true, message: 'Tạo landmark thành công', data });
         } catch (err) {
             console.error('[LandmarkController.create]', err);
@@ -102,7 +107,13 @@ const LandmarkController = {
     async update(req, res) {
         try {
             const { id } = req.params;
-            const data = await LandmarkModel.update(parseInt(id), req.body);
+
+            // Nếu có file upload mới → dùng file, không thì giữ image_url từ body (hoặc giữ nguyên DB)
+            const image_url = req.file
+                ? `/uploads/${req.file.filename}`
+                : req.body.image_url;
+
+            const data = await LandmarkModel.update(parseInt(id), { ...req.body, image_url });
             if (!data) {
                 return res.status(404).json({ success: false, message: `Không tìm thấy landmark ID: ${id}` });
             }

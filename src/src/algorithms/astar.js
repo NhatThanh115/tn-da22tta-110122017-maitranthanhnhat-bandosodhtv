@@ -19,12 +19,12 @@ const CAMPUS_GATES = [
         label : 'Cổng 1',
         lng   : 106.346493,
         lat   : 9.923712,
-        nodeId: null,   // Sẽ được resolve khi cần (lazy)
+        nodeId: null,  
     },
     {
         label : 'Cổng 2',
-        lng   : 106.347432,   // Điểm trong campus (cuối GeoJSON LineString)
-        lat   : 9.923535,     // 9.923771 là điểm ngoài cổng, 9.923535 là điểm kết nối vào road graph
+        lng   : 106.347432,   
+        lat   : 9.923535,     
         nodeId: null,
     },
     {

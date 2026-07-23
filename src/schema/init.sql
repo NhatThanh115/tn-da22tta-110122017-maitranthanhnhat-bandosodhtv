@@ -12,7 +12,6 @@
 -- (Tạo extension, bảng, index, function, view)
 -- ============================================================
 
--- Active: 1779293081967@@127.0.0.1@5432@postgres@public
 -- ============================================================
 -- SCHEMA: TVU Digital Map (Đã Tối Ưu Hóa)
 -- Database: PostgreSQL + PostGIS + pgRouting
@@ -124,9 +123,8 @@ CREATE TABLE admin_config (
 );
 
 -- Seed: mật khẩu mặc định cho màn hình xác thực (Validate.vue)
--- ⚠ Đổi giá trị này trước khi deploy lên production.
 INSERT INTO admin_config (config_key, config_value, description, is_secret)
-VALUES ('admin_password', 'admin@tvu2025', 'Mật khẩu xác thực trang quản trị (/admin/validate)', TRUE)
+VALUES ('admin_password', 'admin@passowrd', 'Mật khẩu xác thực trang quản trị (/admin/validate)', TRUE)
 ON CONFLICT (config_key) DO NOTHING;
 
 
@@ -170,10 +168,6 @@ RETURNS TRIGGER AS $$
 BEGIN
     NEW.cost := ST_Length(NEW.geom::geography);
 
-    -- BUG FIX: DEFAULT là -1 (không phải NULL), nên điều kiện IS NULL không bao giờ đúng.
-    -- Giải pháp: Nếu reverse_cost <= 0 (tức là chưa được set thủ công thành giá trị dương),
-    -- tự động gán bằng cost → đường 2 chiều (đây là hành vi mong muốn cho campus).
-    -- Muốn đường 1 chiều thực sự: truyền reverse_cost = -1 TƯỜNG MINH sau khi INSERT.
     IF NEW.reverse_cost IS NULL OR NEW.reverse_cost < 0 THEN
         NEW.reverse_cost := NEW.cost;
     END IF;
@@ -256,26 +250,26 @@ INSERT INTO landmarks (name, category, description, geom) VALUES
 ('Tòa nhà A1', 'Khu hiệu bộ', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.3469362024444, 9.923229497144021), 4326)),
 ('Phòng Công tác Sinh viên', 'Văn phòng', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.3467503094339, 9.922986719300553), 4326)),
 ('Tòa nhà C1', 'Khoa Y Dược', 'Điểm mốc C1', ST_SetSRID(ST_MakePoint(106.34783224742603, 9.923328253636143), 4326)),
-('Tòa nhà C2', 'Uncategorized', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34765888640061, 9.92283858303604), 4326)),
-('Tòa nhà C3', 'Uncategorized', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34800769702701, 9.922869444651269), 4326)),
-('Tòa nhà C4', 'Uncategorized', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34830057818306, 9.922753222122253), 4326)),
+('Tòa nhà C2', 'Điện - Điện tử', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34765888640061, 9.92283858303604), 4326)),
+('Tòa nhà C3', 'Cơ khí Cắt gọt', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34800769702701, 9.922869444651269), 4326)),
+('Tòa nhà C4', 'Cơ khí Động lực', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34830057818306, 9.922753222122253), 4326)),
 ('Tòa nhà C5', 'Khoa Kỹ thuật và Công nghệ', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.3483632387755, 9.922430203622184), 4326)),
 ('Tòa nhà C6', 'Uncategorized', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.3483632387755, 9.922181252840659), 4326)),
-('Tòa nhà C7', 'Uncategorized', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34807082208744, 9.922063978765678), 4326)),
-('Tòa nhà C8', 'Uncategorized', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34772618883324, 9.922041346858919), 4326)),
-('Tòa nhà C9', 'Uncategorized', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34837343289212, 9.921826213527524), 4326)),
+('Tòa nhà C7', 'Bộ môn CNTT', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34807082208744, 9.922063978765678), 4326)),
+('Tòa nhà C8', 'Bộ môn Xây dựng', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34772618883324, 9.922041346858919), 4326)),
+('Tòa nhà C9', 'Bộ môn Điện tử', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34837343289212, 9.921826213527524), 4326)),
 ('Tòa nhà D3', 'Phòng lý thuyết', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34796466398785, 9.92142777449368), 4326)),
-('Tòa nhà D4', 'Uncategorized', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34841837587231, 9.921225392998636), 4326)),
-('Tòa nhà D5', 'Uncategorized', 'Điểm tọa độ số 16', ST_SetSRID(ST_MakePoint(106.3482043605132, 9.920985064283698), 4326)),
+('Tòa nhà D4', 'Trung tâm Giáo dục Quốc phòng và An ninh', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34841837587231, 9.921225392998636), 4326)),
+('Tòa nhà D5', 'Hội trường', 'Điểm tọa độ số 16', ST_SetSRID(ST_MakePoint(106.3482043605132, 9.920985064283698), 4326)),
 ('Tòa nhà A2', 'Phòng lý thuyết', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34725390787702, 9.922394842163328), 4326)),
 ('Tòa nhà B5', 'Khoa Nông nghiệp Thủy sản', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34627800205635, 9.921621156236938), 4326)),
 ('Tòa nhà B6', 'Nhà nghỉ chuyên gia', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34625874060953, 9.921186878527777), 4326)),
-('Sân cỏ nhân tạo', 'Uncategorized', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34721966821894, 9.920792654836589), 4326)),
+('Sân cỏ nhân tạo', 'Thể dục - Thể thao', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34721966821894, 9.920792654836589), 4326)),
 ('Tòa nhà D6', 'Khoa Sư phạm', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34797086043449, 9.920069559393042), 4326)),
-('Tòa nhà D7', 'Uncategorized', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34800297381156, 9.919954390188778), 4326)),
-('Tòa nhà B8', 'Uncategorized', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34746193260332, 9.919832738205528), 4326)),
+('Tòa nhà D7', 'Phòng máy tính', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34800297381156, 9.919954390188778), 4326)),
+('Tòa nhà B8', 'Bộ môn Thủy sản', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34746193260332, 9.919832738205528), 4326)),
 ('Tòa nhà B7', 'Thư viện', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34683855955439, 9.920016181800463), 4326)),
-('Tòa nhà D8', 'Uncategorized', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34845123375567, 9.919812835002489), 4326)),
+('Tòa nhà D8', 'Khu tự học', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34845123375567, 9.919812835002489), 4326)),
 ('Tòa nhà B9', 'Viện Công nghệ Sinh học', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34641635317041, 9.919056894741288), 4326)),
 ('Chăn nuôi-trồng trọt', 'Uncategorized', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34883910605839, 9.919248580451807), 4326)),
 ('Tòa nhà G1', 'Ký túc xá', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34915741307742, 9.921990764438164), 4326)),
@@ -285,10 +279,9 @@ INSERT INTO landmarks (name, category, description, geom) VALUES
 ('Tòa nhà G2', 'Ký túc xá', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.35001826760481, 9.922086044106194), 4326)),
 ('Tòa nhà E4', 'Bệnh viện', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34690113319476, 9.924312649657367), 4326)),
 ('Tòa nhà E3', 'Khoa Ngôn ngữ -Văn hóa-Nghệ thuật Khmer Nam Bộ', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34631111103704, 9.924779511575807), 4326)),
-('Tòa nhà E1', 'Uncategorized', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.3459193735481, 9.924045871692016), 4326)),
+('Tòa nhà E1', 'Khu điều trị Răng - Hàm - Mặt', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.3459193735481, 9.924045871692016), 4326)),
 ('Tòa nhà E2', 'Phòng lý thuyết', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34576461305699, 9.924536553094526), 4326)),
-('Sân bóng chuyền', 'Uncategorized', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34899227694387, 9.920584312211332), 4326));
-
+('Sân bóng chuyền', 'Thể dục - Thể thao', 'Điểm tọa độ từ GeoJSON', ST_SetSRID(ST_MakePoint(106.34899227694387, 9.920584312211332), 4326));
 
 -- ============================================================
 -- PHẦN 3: SEED DATA – Dữ liệu tin tức từ news.sql
@@ -389,8 +382,8 @@ BEGIN
         -- Trích xuất ký tự viết tắt (ví dụ: 'Tòa nhà C7' -> 'C7')
         short_name := SUBSTRING(r.name FROM 'Tòa nhà (.+)');
 
-        -- Sinh phòng cho tầng 1, 2 và 3
-        FOR floor IN 1..3 LOOP
+        -- Sinh phòng cho tầng 1, 2
+        FOR floor IN 1..2 LOOP
             -- Mỗi tầng sinh ngẫu nhiên 2 phòng (phòng 01 và phòng 02)
             FOR room_num IN 1..2 LOOP
 

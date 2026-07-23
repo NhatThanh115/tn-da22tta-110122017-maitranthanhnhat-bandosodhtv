@@ -11,6 +11,7 @@ const showModal = ref(false);
 const editingItem = ref(null);
 const searchQuery = ref('');
 const filterCategory = ref('');
+const filterRoomLandmark = ref('');
 const currentPage = ref(1);
 const itemsPerPage = 10;
 
@@ -19,6 +20,7 @@ const landmarks = ref([]);
 const news = ref([]);
 const roadNodes = ref([]);
 const roads = ref([]);
+const rooms = ref([]);
 
 // ── News form specific ──
 const newsForm = ref({
@@ -38,6 +40,7 @@ const stats = computed(() => [
   { label: 'Tin tức', value: news.value.length, icon: 'fa-newspaper', color: 'green', change: '+5', up: true },
   { label: 'Road Nodes', value: roadNodes.value.length, icon: 'fa-circle-nodes', color: 'gold', change: '0', up: true },
   { label: 'Đường đi', value: roads.value.length, icon: 'fa-road', color: 'purple', change: '+2', up: true },
+  { label: 'Phòng', value: rooms.value.length, icon: 'fa-door-open', color: 'teal', change: '0', up: true },
 ]);
 
 // ── Tabs config ──
@@ -46,6 +49,7 @@ const tabs = [
   { key: 'news', label: 'Tin tức', icon: 'fa-newspaper' },
   { key: 'roadnodes', label: 'Nodes', icon: 'fa-circle-nodes' },
   { key: 'roads', label: 'Đường đi', icon: 'fa-road' },
+  { key: 'rooms', label: 'Phòng', icon: 'fa-door-open' },
 ];
 
 // ── News type options ──
@@ -74,15 +78,19 @@ const currentData = computed(() => {
   else if (activeMenu.value === 'news') data = news.value;
   else if (activeMenu.value === 'roadnodes') data = roadNodes.value;
   else if (activeMenu.value === 'roads') data = roads.value;
+  else if (activeMenu.value === 'rooms') data = rooms.value;
 
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase();
     data = data.filter(item =>
-      (item.name || item.title || '').toLowerCase().includes(q)
+      (item.name || item.title || item.room_name || '').toLowerCase().includes(q)
     );
   }
   if (filterCategory.value && activeMenu.value === 'landmarks') {
     data = data.filter(item => item.category === filterCategory.value);
+  }
+  if (filterRoomLandmark.value && activeMenu.value === 'rooms') {
+    data = data.filter(item => item.landmark_id === Number(filterRoomLandmark.value));
   }
   return data;
 });
@@ -113,6 +121,11 @@ const formFields = computed(() => {
     { key: 'lng', label: 'Kinh độ (lng)', type: 'number', half: true },
     { key: 'lat', label: 'Vĩ độ (lat)', type: 'number', half: true },
   ];
+  if (activeMenu.value === 'rooms') return [
+    { key: 'room_name', label: 'Tên phòng', type: 'text', required: true },
+    { key: 'landmark_id', label: 'ID Địa điểm (Landmark)', type: 'number', required: true },
+    { key: 'description', label: 'Mô tả', type: 'textarea' },
+  ];
   return [
     { key: 'name', label: 'Tên đường', type: 'text' },
     { key: 'source', label: 'Node nguồn', type: 'number', half: true },
@@ -127,6 +140,7 @@ const apiBase = {
   news: '/api/news',
   roadnodes: '/api/paths/nodes',
   roads: '/api/paths',
+  rooms: '/api/rooms',
 };
 
 async function fetchData(type) {
@@ -142,12 +156,14 @@ async function fetchData(type) {
 
 async function loadAll() {
   loading.value = true;
-  const [l, n, rn, r] = await Promise.all([
+  const [l, n, rn, r, rm] = await Promise.all([
     fetchData('landmarks'), fetchData('news'),
     fetchData('roadnodes'), fetchData('roads'),
+    fetchData('rooms'),
   ]);
   landmarks.value = l; news.value = n;
   roadNodes.value = rn; roads.value = r;
+  rooms.value = rm;
   loading.value = false;
 }
 
@@ -266,7 +282,8 @@ async function saveForm() {
 }
 
 async function deleteItem(item) {
-  if (!confirm(`Xóa "${item.name || item.title}" ?`)) return;
+  const label = item.name || item.title || item.room_name || `ID ${item.id}`;
+  if (!confirm(`Xóa "${label}" ?`)) return;
   const base = apiBase[activeMenu.value];
   try {
     await fetch(`${base}/${item.id}`, { method: 'DELETE' });
@@ -279,6 +296,7 @@ function switchTab(key) {
   currentPage.value = 1;
   searchQuery.value = '';
   filterCategory.value = '';
+  filterRoomLandmark.value = '';
 }
 
 function getCoords(item) {
@@ -362,6 +380,12 @@ onMounted(loadAll);
               <i class="fa-solid fa-road"></i> Đường đi
             </button>
           </li>
+          <li :class="{ active: activeMenu === 'rooms' }">
+            <button @click="switchTab('rooms')" id="nav-rooms">
+              <i class="fa-solid fa-door-open"></i> Phòng
+              <span class="nav-badge">{{ rooms.length }}</span>
+            </button>
+          </li>
         </ul>
       </div>
 
@@ -380,7 +404,7 @@ onMounted(loadAll);
       <header class="admin-header">
         <div class="header-left">
           <div>
-            <h1>{{ activeMenu === 'dashboard' ? 'Dashboard' : tabs.find(t => t.key === activeMenu)?.label || 'Quản lý' }}</h1>
+            <h1>{{ activeMenu === 'dashboard' ? 'Dashboard' : (tabs.find(t => t.key === activeMenu)?.label ? 'Quản lý ' + tabs.find(t => t.key === activeMenu)?.label : 'Quản lý') }}</h1>
             <div class="header-breadcrumb">
               <span>Admin</span>
               <i class="fa-solid fa-chevron-right"></i>
@@ -396,7 +420,7 @@ onMounted(loadAll);
         <!-- Stats -->
         <div class="stats-grid">
           <div class="stat-card" v-for="s in stats" :key="s.label"
-               :style="{ '--card-accent': s.color === 'blue' ? '#3b82f6' : s.color === 'green' ? '#22c55e' : s.color === 'gold' ? '#eec643' : '#a855f7' }">
+               :style="{ '--card-accent': s.color === 'blue' ? '#3b82f6' : s.color === 'green' ? '#22c55e' : s.color === 'gold' ? '#eec643' : s.color === 'teal' ? '#14b8a6' : '#a855f7' }">
             <div class="stat-info">
               <h3>{{ s.label }}</h3>
               <div class="stat-value">{{ s.value }}</div>
@@ -413,7 +437,7 @@ onMounted(loadAll);
           <div class="data-panel">
             <!-- Panel header with tabs -->
             <div class="panel-header">
-              <h2><i class="fa-solid" :class="tabs.find(t => t.key === activeMenu)?.icon"></i> Quản lý {{ tabs.find(t => t.key === activeMenu)?.label }}</h2>
+              <h2><i class="fa-solid" :class="tabs.find(t => t.key === activeMenu)?.icon"></i> Quản lý {{ tabs.find(t => t.key === activeMenu)?.label || '' }}</h2>
               <div class="panel-actions">
                 <button class="btn-admin primary" @click="openCreate" id="btn-create">
                   <i class="fa-solid fa-plus"></i> Thêm mới
@@ -430,6 +454,10 @@ onMounted(loadAll);
               <select v-if="activeMenu === 'landmarks'" class="filter-select" v-model="filterCategory" id="filter-category">
                 <option value="">Tất cả danh mục</option>
                 <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
+              </select>
+              <select v-if="activeMenu === 'rooms'" class="filter-select" v-model="filterRoomLandmark" id="filter-room-landmark">
+                <option value="">Tất cả địa điểm</option>
+                <option v-for="lm in landmarks" :key="lm.id" :value="lm.id">{{ lm.name }}</option>
               </select>
               <button class="btn-admin outline" @click="loadAll" id="btn-refresh">
                 <i class="fa-solid fa-rotate"></i> Refresh
@@ -532,6 +560,27 @@ onMounted(loadAll);
               </table>
             </div>
 
+            <!-- Table: Rooms -->
+            <div class="admin-table-wrap" v-if="activeMenu === 'rooms'">
+              <table class="admin-table">
+                <thead><tr>
+                  <th>ID</th><th>Tên phòng</th><th>Địa điểm</th><th>Mô tả</th><th></th>
+                </tr></thead>
+                <tbody>
+                  <tr v-for="item in paginatedData" :key="item.id">
+                    <td class="cell-id">#{{ item.id }}</td>
+                    <td class="cell-name">{{ item.room_name }}</td>
+                    <td class="muted">{{ landmarks.find(l => l.id === item.landmark_id)?.name || ('ID ' + item.landmark_id) }}</td>
+                    <td class="muted" style="max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ item.description || '—' }}</td>
+                    <td class="cell-actions">
+                      <button class="action-btn" title="Sửa" @click="openEdit(item)"><i class="fa-solid fa-pen"></i></button>
+                      <button class="action-btn delete" title="Xóa" @click="deleteItem(item)"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
             <!-- Empty state -->
             <div class="empty-state" v-if="!loading && paginatedData.length === 0">
               <i class="fa-solid fa-inbox"></i>
@@ -579,7 +628,7 @@ onMounted(loadAll);
       <div class="modal-backdrop" v-if="showModal" @click.self="showModal = false">
         <div class="modal-box" :class="{ 'modal-wide': activeMenu === 'news' }">
           <div class="modal-header">
-            <h3>{{ editingItem ? 'Chỉnh sửa' : 'Thêm mới' }} {{ tabs.find(t => t.key === activeMenu)?.label }}</h3>
+            <h3>{{ editingItem ? 'Chỉnh sửa' : 'Thêm mới' }} {{ tabs.find(t => t.key === activeMenu)?.label || '' }}</h3>
             <button class="modal-close" @click="showModal = false" id="modal-close"><i class="fa-solid fa-xmark"></i></button>
           </div>
           <div class="modal-body">

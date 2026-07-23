@@ -1049,26 +1049,20 @@ watch(selectedLocation, (loc) => {
          MOBILE BOTTOM NAVIGATION
     ══════════════════════════════════════════ -->
     <nav class="mobile-bottom-nav" id="gm-mobile-nav">
-      <button class="bottom-nav-item" :class="{ 'bnav-active': activeTab === 'explore' }" @click="activeTab = 'explore'" id="gm-nav-explore">
+      <!-- Khám phá: trang hiện tại (Mappage) -->
+      <button class="bottom-nav-item bnav-active" id="gm-nav-explore">
         <i class="fa-solid fa-compass"></i>
         <span>Khám phá</span>
       </button>
-      <button class="bottom-nav-item" :class="{ 'bnav-active': activeTab === 'route' }" @click="activeTab = 'route'" id="gm-nav-route">
-        <i class="fa-solid fa-route"></i>
+      <!-- Tin tức: chuyển sang Newspage -->
+      <button class="bottom-nav-item" @click="$router.push({ name: 'Newspage' })" id="gm-nav-news">
+        <i class="fa-solid fa-newspaper"></i>
         <span>Tin tức</span>
       </button>
-      <button class="bottom-nav-item bottom-nav-center" :class="{ 'bnav-active': activeTab === 'map' }" @click="activeTab = 'map'" id="gm-nav-map">
-        <div class="bnav-center-circle">
-          <i class="fa-solid fa-map-location-dot"></i>
-        </div>
-      </button>
-      <button class="bottom-nav-item" :class="{ 'bnav-active': activeTab === 'saved' }" @click="activeTab = 'saved'" id="gm-nav-saved">
-        <i class="fa-regular fa-bookmark"></i>
+      <!-- Danh sách: chuyển sang Landmarkpage -->
+      <button class="bottom-nav-item" @click="$router.push({ name: 'Landmarkpage' })" id="gm-nav-landmarks">
+        <i class="fa-solid fa-building"></i>
         <span>Danh sách</span>
-      </button>
-      <button class="bottom-nav-item" :class="{ 'bnav-active': activeTab === 'profile' }" @click="activeTab = 'profile'" id="gm-nav-profile">
-        <i class="fa-solid fa-user"></i>
-        <span>Cá nhân</span>
       </button>
     </nav>
 

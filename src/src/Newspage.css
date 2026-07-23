@@ -218,7 +218,7 @@
 /* ========================================
    ARTICLES COLUMN
    ======================================== */
-.news-articles-col {}
+/* .news-articles-col {} */
 
 /* Featured Article */
 .news-featured {
@@ -328,6 +328,7 @@
   line-height: 1.35;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -336,6 +337,7 @@
   margin: 0 0 6px 0; line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -669,4 +671,11 @@
   .news-card-thumb { width: 100%; height: 140px; }
   .news-tabs { gap: 4px; }
   .news-tab-btn { font-size: 0.78rem; padding: 0.4rem 0.75rem; }
+}
+
+/* ── Mobile bottom nav padding ── */
+@media (max-width: 768px) {
+  .newspage-wrapper {
+    padding-bottom: 64px; /* height of mobile bottom nav */
+  }
 }

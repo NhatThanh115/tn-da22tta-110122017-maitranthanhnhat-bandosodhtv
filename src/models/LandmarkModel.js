@@ -113,17 +113,20 @@ const LandmarkModel = {
      * Cập nhật landmark theo ID
      */
     async update(id, { name, category, description, image_url, metadata, connected_node_id, lng, lat }) {
+        // Tính sẵn boolean để tránh PostgreSQL không infer được kiểu của null
+        const hasGeom = lng != null && lat != null && !isNaN(Number(lng)) && !isNaN(Number(lat));
+
         const rows = await sql`
             UPDATE landmarks SET
-                name              = COALESCE(${name || null}, name),
-                category          = COALESCE(${category || null}, category),
-                description       = COALESCE(${description || null}, description),
-                image_url         = COALESCE(${image_url || null}, image_url),
-                metadata          = COALESCE(${metadata ? sql.json(metadata) : null}, metadata),
-                connected_node_id = COALESCE(${connected_node_id || null}, connected_node_id),
+                name              = COALESCE(${name              ?? null}::text,  name),
+                category          = COALESCE(${category          ?? null}::text,  category),
+                description       = COALESCE(${description       ?? null}::text,  description),
+                image_url         = COALESCE(${image_url         ?? null}::text,  image_url),
+                metadata          = COALESCE(${metadata ? sql.json(metadata) : null}::jsonb, metadata),
+                connected_node_id = COALESCE(${connected_node_id != null ? parseInt(connected_node_id) : null}::int, connected_node_id),
                 geom              = CASE
-                                        WHEN ${lng || null} IS NOT NULL AND ${lat || null} IS NOT NULL
-                                        THEN ST_SetSRID(ST_MakePoint(${lng || 0}, ${lat || 0}), 4326)
+                                        WHEN ${hasGeom}
+                                        THEN ST_SetSRID(ST_MakePoint(${Number(lng || 0)}::float8, ${Number(lat || 0)}::float8), 4326)
                                         ELSE geom
                                     END
             WHERE id = ${id}

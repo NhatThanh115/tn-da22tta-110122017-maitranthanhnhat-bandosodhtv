@@ -56,7 +56,7 @@ services:
     # với Linux container (native binary musl khác Win32).
     # Giải pháp: dùng named volume che đi node_modules host, sau đó
     # chạy npm install BÊN TRONG container để cài đúng binary Linux.
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
+    command: sh -c "npm install --no-audit --prefer-offline --loglevel=error; npm run dev -- --host 0.0.0.0 --port 5173"
     volumes:
       # Mount toàn bộ source code từ host (hot-reload)
       - .:/app:delegated

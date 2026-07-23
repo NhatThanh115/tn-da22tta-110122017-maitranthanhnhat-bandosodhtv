@@ -236,6 +236,32 @@ onMounted(fetchLandmarks);
       </div>
     </section>
 
+    <!-- ===== MOBILE FILTER BAR (chỉ hiện trên mobile) ===== -->
+    <div class="lm-mobile-filter-bar" v-if="!isLoading">
+      <div class="lm-mobile-filter-inner">
+        <i class="fa-solid fa-sliders lm-mfb-icon"></i>
+        <select
+          class="lm-mobile-cat-select"
+          v-model="activeCategory"
+          id="lm-mobile-cat-select"
+          aria-label="Lọc danh mục"
+        >
+          <option value="all">Tất cả danh mục</option>
+          <option v-for="cat in categories" :key="cat.name" :value="cat.name">
+            {{ cat.name }} ({{ cat.count }})
+          </option>
+        </select>
+        <button
+          v-if="activeCategory !== 'all'"
+          class="lm-mfb-clear"
+          @click="activeCategory = 'all'"
+          aria-label="Xóa bộ lọc"
+        >
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+
     <!-- ===== STATS BAR ===== -->
     <div class="lm-stats-bar" v-if="!isLoading">
       <span class="lm-stats-text">
@@ -435,6 +461,25 @@ onMounted(fetchLandmarks);
         <p>© 2026 TVU. Tất cả quyền được bảo lưu.</p>
       </div>
     </footer>
+
+    <!-- ===== MOBILE BOTTOM NAV ===== -->
+    <nav class="mobile-bottom-nav" id="lm-mobile-nav">
+      <!-- Khám phá: chuyển sang Mappage -->
+      <button class="bottom-nav-item" @click="$router.push({ name: 'Mappage' })" id="lm-nav-explore">
+        <i class="fa-solid fa-compass"></i>
+        <span>Khám phá</span>
+      </button>
+      <!-- Tin tức: chuyển sang Newspage -->
+      <button class="bottom-nav-item" @click="$router.push({ name: 'Newspage' })" id="lm-nav-news">
+        <i class="fa-solid fa-newspaper"></i>
+        <span>Tin tức</span>
+      </button>
+      <!-- Danh sách: trang hiện tại -->
+      <button class="bottom-nav-item bnav-active" id="lm-nav-landmarks">
+        <i class="fa-solid fa-building"></i>
+        <span>Danh sách</span>
+      </button>
+    </nav>
 
   </div>
 </template>

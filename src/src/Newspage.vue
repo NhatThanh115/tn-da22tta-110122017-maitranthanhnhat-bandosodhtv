@@ -533,5 +533,24 @@ onMounted(async () => {
       </div>
     </transition>
 
+    <!-- ===== MOBILE BOTTOM NAV ===== -->
+    <nav class="mobile-bottom-nav" id="news-mobile-nav">
+      <!-- Khám phá: chuyển sang Mappage -->
+      <button class="bottom-nav-item" @click="$router.push({ name: 'Mappage' })" id="news-nav-explore">
+        <i class="fa-solid fa-compass"></i>
+        <span>Khám phá</span>
+      </button>
+      <!-- Tin tức: trang hiện tại -->
+      <button class="bottom-nav-item bnav-active" id="news-nav-news">
+        <i class="fa-solid fa-newspaper"></i>
+        <span>Tin tức</span>
+      </button>
+      <!-- Danh sách: chuyển sang Landmarkpage -->
+      <button class="bottom-nav-item" @click="$router.push({ name: 'Landmarkpage' })" id="news-nav-landmarks">
+        <i class="fa-solid fa-building"></i>
+        <span>Danh sách</span>
+      </button>
+    </nav>
+
   </div>
 </template>
